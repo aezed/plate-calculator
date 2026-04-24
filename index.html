@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0e0e0d">
-<title>PLATE CALC</title>
+<title>Plate Calculator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -19,12 +19,16 @@
     --border: #2a2a27;
     --border-hot: #3d3d38;
     --text: #e8e6df;
-    --text-dim: #8a877c;
-    --text-faint: #504e47;
+    --text-dim: #a8a59a;
+    --text-faint: #7a776d;
     --accent: #e6c547;
     --accent-soft: #8a7a2a;
     --red: #c94b3a;
     --green: #7a9e56;
+    --plate-blue: #5a9bd4;
+    --plate-blue-border: #2f5a82;
+    --plate-green: #6fb559;
+    --plate-green-border: #3d6f32;
     --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   }
 
@@ -71,24 +75,37 @@
 
   /* --- Header --- */
   header {
+    display: block;
+  }
+
+  .app-title {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px 12px;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--border);
     gap: 12px;
   }
-
-  .brand {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.22em;
-    color: var(--text-faint);
+  .title-text {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    color: var(--text);
   }
-  .brand b { color: var(--accent); font-weight: 700; }
+  .title-text b {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .machine-row {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .machine-row .section-label {
+    margin-bottom: 8px;
+  }
 
   .machine-picker {
-    flex: 1;
     display: flex;
     align-items: center;
     background: var(--card);
@@ -153,7 +170,7 @@
   .target-input {
     background: var(--card);
     border: 1px solid var(--border);
-    height: 84px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -164,9 +181,9 @@
     width: 100%;
     height: 100%;
     text-align: center;
-    font-size: 48px;
+    font-size: 30px;
     font-weight: 500;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     color: var(--text);
     background: transparent;
     padding: 0 8px;
@@ -176,9 +193,9 @@
 
   .unit-tag {
     position: absolute;
-    right: 10px;
-    bottom: 8px;
-    font-size: 10px;
+    right: 8px;
+    bottom: 5px;
+    font-size: 9px;
     color: var(--text-faint);
     letter-spacing: 0.15em;
   }
@@ -191,8 +208,8 @@
     font-weight: 500;
     transition: background 0.1s, color 0.1s, border-color 0.1s;
   }
-  .delta-big { height: 84px; font-size: 14px; }
-  .delta-small { height: 38px; }
+  .delta-big { height: 56px; font-size: 13px; }
+  .delta-small { height: 34px; }
 
   .delta-big:active, .delta-small:active {
     background: var(--accent);
@@ -219,9 +236,9 @@
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    padding-bottom: 16px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
   .total-label {
     font-size: 10px;
@@ -230,10 +247,10 @@
     font-weight: 600;
   }
   .total-value {
-    font-size: 36px;
+    font-size: 22px;
     font-weight: 600;
     color: var(--accent);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
   }
   .total-value.exact { color: var(--green); }
   .miss {
@@ -249,55 +266,107 @@
     display: grid;
     gap: 14px;
   }
-  .pegs.two { grid-template-columns: 1fr 1fr; }
 
   .peg {
     background: var(--card-deep);
     border: 1px solid var(--border);
-    padding: 14px 12px;
+    padding: 12px 14px 16px;
   }
   .peg-label {
     font-size: 10px;
     letter-spacing: 0.22em;
     color: var(--text-faint);
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
   }
-  .peg-weight {
-    font-size: 28px;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1;
-    margin-bottom: 10px;
-    letter-spacing: -0.01em;
-  }
-  .peg-weight .unit {
-    font-size: 11px;
-    color: var(--text-faint);
-    margin-left: 4px;
-    font-weight: 400;
-    letter-spacing: 0.1em;
-  }
-  .peg-plates {
-    font-size: 14px;
+  .peg-label .weight-inline {
     color: var(--text-dim);
-    line-height: 1.5;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  .peg-label .weight-inline b {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    margin-right: 2px;
+  }
+
+  .peg-plates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    align-items: center;
+    min-height: 72px;
   }
   .peg-plates .empty {
     color: var(--text-faint);
     font-style: italic;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
   }
-  .peg-plates .plate-chip {
-    display: inline-block;
-    padding: 1px 6px;
-    margin: 2px 3px 2px 0;
+  .plate-chip {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    min-width: 68px;
+    height: 72px;
+    padding: 0 12px;
     background: var(--card);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-hot);
     color: var(--text);
-    font-size: 12px;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    line-height: 72px;
+  }
+  .plate-chip .count {
+    color: var(--text-dim);
+    font-size: 22px;
+    font-weight: 600;
+    margin-right: 6px;
+    letter-spacing: 0.01em;
+  }
+  .plate-chip.c-blue {
+    color: var(--plate-blue);
+    border-color: var(--plate-blue-border);
+  }
+  .plate-chip.c-green {
+    color: var(--plate-green);
+    border-color: var(--plate-green-border);
+  }
+
+  .voltra-chip {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    min-width: 140px;
+    height: 86px;
+    padding: 0 22px;
+    background: var(--card);
+    border: 1px solid var(--border-hot);
+    color: var(--text);
+    font-size: 52px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 86px;
+  }
+  .voltra-chip .unit {
+    font-size: 14px;
+    color: var(--text-faint);
+    margin-left: 10px;
+    letter-spacing: 0.15em;
     font-weight: 500;
-    letter-spacing: 0.02em;
   }
 
   .machine-meta {
@@ -381,6 +450,35 @@
     height: 36px;
     font-size: 13px;
     min-width: 150px;
+    width: 100%;
+  }
+  .num-row { align-items: center; }
+  .field-label {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--text-faint);
+    font-weight: 600;
+    min-width: 80px;
+  }
+  .num-input {
+    flex: 1;
+    background: var(--card-deep);
+    border: 1px solid var(--border);
+    padding: 0 10px;
+    height: 36px;
+    font-size: 14px;
+    color: var(--text);
+    -moz-appearance: textfield;
+  }
+  .num-input:focus { border-color: var(--accent); }
+  .num-input::-webkit-outer-spin-button,
+  .num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .unit-label {
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    min-width: 20px;
   }
   .delete-btn {
     color: var(--red);
@@ -414,19 +512,28 @@
 
   /* --- Small screens --- */
   @media (max-width: 380px) {
-    #target { font-size: 42px; }
-    .total-value { font-size: 30px; }
-    .peg-weight { font-size: 24px; }
+    #target { font-size: 26px; }
+    .total-value { font-size: 20px; }
+    .plate-chip { height: 62px; min-width: 58px; font-size: 28px; line-height: 62px; padding: 0 9px; }
+    .plate-chip .count { font-size: 18px; }
+    .voltra-chip { height: 72px; min-width: 120px; font-size: 42px; line-height: 72px; padding: 0 16px; }
+    .peg-plates { min-height: 62px; }
   }
 </style>
 </head>
 <body>
 <div id="app">
   <header>
-    <div class="machine-picker">
-      <select id="machineSelect" aria-label="Select machine"></select>
+    <div class="app-title">
+      <span class="title-text">PLATE <b>CALCULATOR</b></span>
+      <button class="icon-btn" id="configBtn" aria-label="Configure machines">⚙</button>
     </div>
-    <button class="icon-btn" id="configBtn" aria-label="Configure machines">⚙</button>
+    <div class="machine-row">
+      <div class="section-label">MACHINE</div>
+      <div class="machine-picker">
+        <select id="machineSelect" aria-label="Select machine"></select>
+      </div>
+    </div>
   </header>
 
   <main>
@@ -439,12 +546,7 @@
       </div>
       <button class="delta-big" data-delta="10">+10</button>
     </div>
-    <div class="delta-small-row">
-      <button class="delta-small" data-delta="-5">−5</button>
-      <button class="delta-small" data-delta="-2.5">−2.5</button>
-      <button class="delta-small" data-delta="2.5">+2.5</button>
-      <button class="delta-small" data-delta="5">+5</button>
-    </div>
+    <div class="delta-small-row" id="deltaSmallRow"></div>
 
     <div class="output" id="output"><!-- populated --></div>
   </main>
@@ -460,9 +562,13 @@
     <button class="add-machine" id="addMachineBtn">+ ADD MACHINE</button>
     <div class="about">
       <b>PLATES</b> 45 · 25 · 10 · 5 · 2.5 lb (unbounded)<br>
-      <b>STANDARD</b> plates both sides, equal · total = 2 × per-side<br>
-      <b>PRIME 2-PEG</b> 3:1 ratio (top = 3 × middle) · total = 4M<br>
-      <b>PRIME 2-PEG ISO</b> same ratio, both sides · total = 8M
+      <b>BARBELL ALSO</b> 1.25 lb micro plates (2.5 lb total steps)<br>
+      <b>PLATE-LOADED</b> symmetric · total = 2 × per-side<br>
+      <b>PRIME 2-PEG</b> 3:1 ratio · exact hit via top-peg overload<br>
+      <b>PRIME 2-PEG ISO</b> 3:1 both sides · exact hit via top-peg overload<br>
+      <b>BARBELL</b> plate-loaded + editable bar weight<br>
+      <b>SMITH (VOLTRA)</b> 5 lb per-side min · 2 lb steps · rounds up<br>
+      <b>SMITH ISO (VOLTRA)</b> symmetric handles · rounds up
     </div>
   </div>
 </div>
@@ -473,19 +579,25 @@
    ============================================================ */
 
 const PLATES = [45, 25, 10, 5, 2.5];
+const BARBELL_PLATES = [45, 25, 10, 5, 2.5, 1.25];
 const STEP = 2.5; // smallest available increment
 
 const MACHINE_TYPES = {
-  'standard':          { label: 'Barbell / Smith / Plate-loaded' },
+  'plate-loaded':      { label: 'Plate-loaded Machine' },
   'prime-bilateral':   { label: 'Prime 2-Peg (Bilateral)' },
   'prime-isolateral':  { label: 'Prime 2-Peg (Isolateral)' },
+  'barbell':           { label: 'Barbell (plate-loaded)' },
+  'smith-iso':         { label: 'Smith Isolateral (Voltra)' },
+  'smith':             { label: 'Smith (Voltra)' },
 };
 
 const DEFAULT_MACHINES = [
-  { id: 'm-bar',      name: 'Barbell / Smith',      type: 'standard' },
-  { id: 'm-plate',    name: 'Plate-loaded Machine', type: 'standard' },
-  { id: 'm-prime',    name: 'Prime 2-Peg',          type: 'prime-bilateral' },
-  { id: 'm-prime-iso',name: 'Prime 2-Peg (Iso)',    type: 'prime-isolateral' },
+  { id: 'm-plate',     name: 'Plate-loaded',      type: 'plate-loaded' },
+  { id: 'm-prime',     name: 'Prime 2-Peg',       type: 'prime-bilateral' },
+  { id: 'm-prime-iso', name: 'Prime 2-Peg (Iso)', type: 'prime-isolateral' },
+  { id: 'm-barbell',   name: 'Barbell',           type: 'barbell', barWeight: 45 },
+  { id: 'm-smith-iso', name: 'Smith (Iso)',       type: 'smith-iso', leftHandle: 45, rightHandle: 45 },
+  { id: 'm-smith',     name: 'Smith',             type: 'smith', barWeight: 45 },
 ];
 
 /* ---------- storage ---------- */
@@ -496,7 +608,12 @@ const LS_TARGET   = 'plateCalc.target.v1';
 function loadMachines() {
   try {
     const raw = localStorage.getItem(LS_MACHINES);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      let machines = JSON.parse(raw);
+      // Migrate legacy 'standard' -> 'plate-loaded'
+      machines = machines.map(m => m.type === 'standard' ? { ...m, type: 'plate-loaded' } : m);
+      return machines;
+    }
   } catch {}
   return [...DEFAULT_MACHINES];
 }
@@ -511,15 +628,14 @@ function saveTarget(v) { localStorage.setItem(LS_TARGET, String(v)); }
 
 /* ---------- solver ---------- */
 
-function decompose(weight) {
-  // weight assumed multiple of 2.5, >= 0
+function decompose(weight, plates = PLATES) {
   const out = [];
-  let rem = Math.round(weight * 10) / 10;
-  for (const p of PLATES) {
+  let rem = Math.round(weight * 100) / 100;
+  for (const p of plates) {
     const n = Math.floor(rem / p + 1e-9);
     if (n > 0) {
       out.push({ plate: p, count: n });
-      rem = Math.round((rem - n * p) * 10) / 10;
+      rem = Math.round((rem - n * p) * 100) / 100;
     }
   }
   return out;
@@ -529,16 +645,16 @@ function roundStep(v, step = STEP) {
   return Math.round(v / step) * step;
 }
 
-function solve(target, type) {
+function solve(target, machine) {
+  const type = machine.type;
   if (!target || target < 0) target = 0;
 
-  if (type === 'standard') {
-    // Total = 2 * perSide.  perSide in steps of 2.5 (>= 0).
-    // So achievable totals are multiples of 5.
+  if (type === 'plate-loaded') {
+    // Total = 2 * perSide. Achievable = multiples of 5.
     const best = Math.max(0, roundStep(target, 5));
     const perSide = best / 2;
     return {
-      kind: 'standard',
+      kind: 'plate-loaded',
       total: best,
       miss: best - target,
       perSide,
@@ -546,33 +662,106 @@ function solve(target, type) {
     };
   }
 
+  if (type === 'barbell') {
+    // Specialty or standard barbell. Plate-loaded with 1.25 lb micro plates available:
+    // 1.25 lb per side => 2.5 lb total granularity.
+    const bar = machine.barWeight || 0;
+    const platesNeeded = Math.max(0, target - bar);
+    const plateTotal = roundStep(platesNeeded, 2.5);
+    const perSide = plateTotal / 2;
+    const total = bar + plateTotal;
+    return {
+      kind: 'barbell',
+      total, miss: total - target,
+      perSide, barWeight: bar, plateTotal,
+      loadout: decompose(perSide, BARBELL_PLATES),
+    };
+  }
+
+  if (type === 'smith') {
+    // Voltra: 0 (off) OR >= 10 lb total (5 lb per side minimum), in 2 lb steps.
+    // Loaded range rounds UP; dead zone rounds to nearest (ties → up).
+    const bar = machine.barWeight || 0;
+    const loadNeeded = Math.max(0, target - bar);
+    let loadTotal;
+    if (loadNeeded === 0) loadTotal = 0;
+    else if (loadNeeded < 5) loadTotal = 0;          // closer to bar-only
+    else if (loadNeeded <= 10) loadTotal = 10;       // closer to Voltra min
+    else loadTotal = Math.ceil(loadNeeded / 2) * 2;
+    const perSide = loadTotal / 2;
+    const total = bar + loadTotal;
+    return {
+      kind: 'smith',
+      total, miss: total - target,
+      perSide, barWeight: bar, loadTotal,
+    };
+  }
+
+  if (type === 'smith-iso') {
+    // Voltra: 0 (off) OR >= 10 lb total (5 lb per side minimum), in 2 lb steps.
+    // Symmetric loading; dead zone rounds to nearest (ties → up).
+    const leftH = machine.leftHandle || 0;
+    const rightH = machine.rightHandle || 0;
+    const handles = leftH + rightH;
+    const loadNeeded = Math.max(0, target - handles);
+    let loadTotal;
+    if (loadNeeded === 0) loadTotal = 0;
+    else if (loadNeeded < 5) loadTotal = 0;
+    else if (loadNeeded <= 10) loadTotal = 10;
+    else loadTotal = Math.ceil(loadNeeded / 2) * 2;
+    const perSide = loadTotal / 2;
+    const total = handles + loadTotal;
+    return {
+      kind: 'smith-iso',
+      total, miss: total - target,
+      perSide, leftHandle: leftH, rightHandle: rightH, loadTotal,
+    };
+  }
+
   if (type === 'prime-bilateral') {
-    // Total = 4M, M >= 2.5 in steps of 2.5.
-    // Achievable totals: 10, 20, 30, 40, ... (multiples of 10, min 10)
-    let M = Math.max(STEP, roundStep(target / 4));
+    // Bilateral target can be any multiple of 2.5 (M + T, both >= 2.5 in 2.5 steps).
+    // Strategy: M = largest multiple of STEP with M <= target/4 (so top >= 3M).
+    //           T = target - M (any overweight falls onto the top peg).
+    const snapped = roundStep(target, STEP);
+    // Minimum loadable: M=2.5, T=7.5 (enforce 3:1 at the floor), total=10.
+    if (snapped < 10) {
+      const M = STEP;
+      const T = 3 * STEP;
+      return {
+        kind: 'prime-bilateral',
+        total: M + T, miss: (M + T) - target,
+        middle: M, top: T, overweight: 0,
+        middleLoadout: decompose(M),
+        topLoadout: decompose(T),
+      };
+    }
+    const M = Math.max(STEP, Math.floor(snapped / (4 * STEP) + 1e-9) * STEP);
+    const T = snapped - M;
     return {
       kind: 'prime-bilateral',
-      total: M * 4,
-      miss: M * 4 - target,
-      middle: M,
-      top: M * 3,
+      total: M + T, miss: (M + T) - target,
+      middle: M, top: T,
+      overweight: T - 3 * M,
       middleLoadout: decompose(M),
-      topLoadout: decompose(M * 3),
+      topLoadout: decompose(T),
     };
   }
 
   if (type === 'prime-isolateral') {
-    // Total = 8M. Achievable totals: 20, 40, 60, ... (multiples of 20, min 20)
-    let M = Math.max(STEP, roundStep(target / 8));
+    // Isolateral total = 2 * perSide; perSide must be a multiple of STEP for
+    // symmetric plate loading. So valid totals are multiples of 5.
+    // Snap target to nearest 5, then apply the same overweight strategy per side.
+    const snapped = Math.max(20, Math.round(target / 5) * 5);
+    const perSide = snapped / 2;
+    const M = Math.max(STEP, Math.floor(perSide / (4 * STEP) + 1e-9) * STEP);
+    const T = perSide - M;
     return {
       kind: 'prime-isolateral',
-      total: M * 8,
-      miss: M * 8 - target,
-      middle: M,
-      top: M * 3,
-      perSide: M * 4,
+      total: 2 * (M + T), miss: 2 * (M + T) - target,
+      middle: M, top: T, perSide: M + T,
+      overweight: T - 3 * M,
       middleLoadout: decompose(M),
-      topLoadout: decompose(M * 3),
+      topLoadout: decompose(T),
     };
   }
 }
@@ -581,7 +770,8 @@ function solve(target, type) {
 
 function fmtNum(n) {
   if (n === 0) return '0';
-  return Number.isInteger(n) ? String(n) : n.toFixed(1).replace(/\.0$/, '');
+  if (Number.isInteger(n)) return String(n);
+  return n.toFixed(2).replace(/\.?0+$/, '');
 }
 
 function fmtSigned(n) {
@@ -596,8 +786,9 @@ function renderLoadout(breakdown) {
   }
   return breakdown
     .map(({ plate, count }) => {
-      const label = count > 1 ? `${count} × ${fmtNum(plate)}` : `${fmtNum(plate)}`;
-      return `<span class="plate-chip">${label}</span>`;
+      const countHtml = count > 1 ? `<span class="count">${count}×</span>` : '';
+      const colorClass = plate === 45 ? ' c-blue' : plate === 25 ? ' c-green' : '';
+      return `<span class="plate-chip${colorClass}">${countHtml}${fmtNum(plate)}</span>`;
     })
     .join('');
 }
@@ -607,39 +798,77 @@ function renderLoadout(breakdown) {
 function render() {
   const target = state.target;
   const machine = state.machines.find(m => m.id === state.activeId) || state.machines[0];
-  const result = solve(target, machine.type);
+  const result = solve(target, machine);
   const off = Math.abs(result.miss) > 0.01;
 
+  const peg = (label, weight, loadoutHtml) => `
+    <div class="peg">
+      <div class="peg-label">
+        <span>${label}</span>
+        <span class="weight-inline"><b>${fmtNum(weight)}</b>LB</span>
+      </div>
+      <div class="peg-plates">${loadoutHtml}</div>
+    </div>`;
+
   let pegsHtml = '';
-  if (result.kind === 'standard') {
+  if (result.kind === 'plate-loaded') {
+    pegsHtml = `<div class="pegs">${peg('PER SIDE · ×2', result.perSide, renderLoadout(result.loadout))}</div>`;
+  } else if (result.kind === 'barbell') {
+    pegsHtml = `
+      <div class="pegs">${peg('PER SIDE · ×2', result.perSide, renderLoadout(result.loadout))}</div>
+      <div class="machine-meta">
+        <span><b>BAR</b> ${fmtNum(result.barWeight)} LB</span>
+        <span><b>PLATES</b> ${fmtNum(result.plateTotal)} LB</span>
+      </div>`;
+  } else if (result.kind === 'smith') {
     pegsHtml = `
       <div class="pegs">
         <div class="peg">
-          <div class="peg-label">PER SIDE · ×2</div>
-          <div class="peg-weight">${fmtNum(result.perSide)}<span class="unit">LB</span></div>
-          <div class="peg-plates">${renderLoadout(result.loadout)}</div>
-        </div>
-      </div>`;
-  } else {
-    const sideNote = result.kind === 'prime-isolateral'
-      ? `<span><b>PER SIDE</b> ${fmtNum(result.perSide)} LB · ×2 SIDES</span>`
-      : `<span><b>SINGLE SET</b> OF PEGS</span>`;
-    pegsHtml = `
-      <div class="pegs two">
-        <div class="peg">
-          <div class="peg-label">MIDDLE · ${result.kind === 'prime-isolateral' ? 'PER SIDE' : ''}</div>
-          <div class="peg-weight">${fmtNum(result.middle)}<span class="unit">LB</span></div>
-          <div class="peg-plates">${renderLoadout(result.middleLoadout)}</div>
-        </div>
-        <div class="peg">
-          <div class="peg-label">TOP · ${result.kind === 'prime-isolateral' ? 'PER SIDE' : ''}</div>
-          <div class="peg-weight">${fmtNum(result.top)}<span class="unit">LB</span></div>
-          <div class="peg-plates">${renderLoadout(result.topLoadout)}</div>
+          <div class="peg-label"><span>PER SIDE · VOLTRA · ×2</span></div>
+          <div class="peg-plates"><span class="voltra-chip">${fmtNum(result.perSide)}<span class="unit">LB</span></span></div>
         </div>
       </div>
       <div class="machine-meta">
-        ${sideNote}
-        <span><b>RATIO</b> 3:1</span>
+        <span><b>BAR</b> ${fmtNum(result.barWeight)} LB</span>
+        <span><b>VOLTRA</b> ${fmtNum(result.loadTotal)} LB TOTAL</span>
+      </div>`;
+  } else if (result.kind === 'smith-iso') {
+    pegsHtml = `
+      <div class="pegs">
+        <div class="peg">
+          <div class="peg-label"><span>PER SIDE · VOLTRA · EACH HANDLE</span></div>
+          <div class="peg-plates"><span class="voltra-chip">${fmtNum(result.perSide)}<span class="unit">LB</span></span></div>
+        </div>
+      </div>
+      <div class="machine-meta">
+        <span><b>HANDLES</b> ${fmtNum(result.leftHandle)} + ${fmtNum(result.rightHandle)} LB</span>
+        <span><b>VOLTRA</b> ${fmtNum(result.loadTotal)} LB TOTAL</span>
+      </div>`;
+  } else if (result.kind === 'prime-bilateral') {
+    const ratioText = result.overweight > 0.01
+      ? `<b>TOP</b> +${fmtNum(result.overweight)} OVER 3:1`
+      : `<b>RATIO</b> 3:1`;
+    pegsHtml = `
+      <div class="pegs">
+        ${peg('TOP', result.top, renderLoadout(result.topLoadout))}
+        ${peg('MIDDLE', result.middle, renderLoadout(result.middleLoadout))}
+      </div>
+      <div class="machine-meta">
+        <span><b>SINGLE SET</b> OF PEGS</span>
+        <span>${ratioText}</span>
+      </div>`;
+  } else if (result.kind === 'prime-isolateral') {
+    const ratioText = result.overweight > 0.01
+      ? `<b>TOP</b> +${fmtNum(result.overweight)} OVER 3:1`
+      : `<b>RATIO</b> 3:1`;
+    pegsHtml = `
+      <div class="pegs">
+        ${peg('TOP · PER SIDE', result.top, renderLoadout(result.topLoadout))}
+        ${peg('MIDDLE · PER SIDE', result.middle, renderLoadout(result.middleLoadout))}
+      </div>
+      <div class="machine-meta">
+        <span><b>PER SIDE</b> ${fmtNum(result.perSide)} LB · ×2</span>
+        <span>${ratioText}</span>
       </div>`;
   }
 
@@ -665,21 +894,47 @@ function renderMachineSelect() {
 
 function renderMachineList() {
   const list = document.getElementById('machineList');
-  list.innerHTML = state.machines.map((m, i) => `
-    <div class="machine-item" data-id="${m.id}">
-      <div class="row">
-        <input type="text" value="${escapeHtml(m.name)}" data-field="name" placeholder="Machine name">
-        <button class="delete-btn" data-action="delete" aria-label="Delete machine">✕</button>
+  list.innerHTML = state.machines.map((m, i) => {
+    let extraFields = '';
+    if (m.type === 'smith' || m.type === 'barbell') {
+      extraFields = `
+        <div class="row num-row">
+          <label class="field-label">BAR</label>
+          <input type="number" value="${m.barWeight ?? 45}" data-field="barWeight" step="0.5" min="0" inputmode="decimal" class="num-input">
+          <span class="unit-label">LB</span>
+        </div>
+      `;
+    } else if (m.type === 'smith-iso') {
+      extraFields = `
+        <div class="row num-row">
+          <label class="field-label">L. HANDLE</label>
+          <input type="number" value="${m.leftHandle ?? 45}" data-field="leftHandle" step="0.5" min="0" inputmode="decimal" class="num-input">
+          <span class="unit-label">LB</span>
+        </div>
+        <div class="row num-row">
+          <label class="field-label">R. HANDLE</label>
+          <input type="number" value="${m.rightHandle ?? 45}" data-field="rightHandle" step="0.5" min="0" inputmode="decimal" class="num-input">
+          <span class="unit-label">LB</span>
+        </div>
+      `;
+    }
+    return `
+      <div class="machine-item" data-id="${m.id}">
+        <div class="row">
+          <input type="text" value="${escapeHtml(m.name)}" data-field="name" placeholder="Machine name">
+          <button class="delete-btn" data-action="delete" aria-label="Delete machine">✕</button>
+        </div>
+        <div class="row">
+          <select data-field="type">
+            ${Object.entries(MACHINE_TYPES).map(([k, v]) =>
+              `<option value="${k}" ${k === m.type ? 'selected' : ''}>${v.label}</option>`
+            ).join('')}
+          </select>
+        </div>
+        ${extraFields}
       </div>
-      <div class="row">
-        <select data-field="type">
-          ${Object.entries(MACHINE_TYPES).map(([k, v]) =>
-            `<option value="${k}" ${k === m.type ? 'selected' : ''}>${v.label}</option>`
-          ).join('')}
-        </select>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function escapeHtml(s) {
@@ -701,14 +956,41 @@ if (!state.machines.find(m => m.id === state.activeId)) {
   state.activeId = state.machines[0]?.id;
 }
 
+function applyDelta(d) {
+  const targetInput = document.getElementById('target');
+  let next = Math.max(0, (state.target || 0) + d);
+  // Snap to 0.5 lb precision to avoid float cruft from successive 2.5/1/2 adds
+  next = Math.round(next * 2) / 2;
+  state.target = next;
+  saveTarget(next);
+  targetInput.value = next;
+  render();
+}
+
+function renderDeltaButtons() {
+  const machine = state.machines.find(m => m.id === state.activeId);
+  const isVoltra = machine && (machine.type === 'smith' || machine.type === 'smith-iso');
+  const deltas = isVoltra ? [-4, -2, 2, 4] : [-5, -2.5, 2.5, 5];
+  const row = document.getElementById('deltaSmallRow');
+  row.innerHTML = deltas.map(d => {
+    const sign = d < 0 ? '−' : '+';
+    return `<button class="delta-small" data-delta="${d}">${sign}${Math.abs(d)}</button>`;
+  }).join('');
+  row.querySelectorAll('[data-delta]').forEach(btn => {
+    btn.addEventListener('click', () => applyDelta(parseFloat(btn.dataset.delta)));
+  });
+}
+
 function init() {
   renderMachineSelect();
+  renderDeltaButtons();
   document.getElementById('target').value = state.target;
   render();
 
   document.getElementById('machineSelect').addEventListener('change', e => {
     state.activeId = e.target.value;
     saveActive(state.activeId);
+    renderDeltaButtons();
     render();
   });
 
@@ -723,17 +1005,9 @@ function init() {
   });
   targetInput.addEventListener('focus', e => e.target.select());
 
-  document.querySelectorAll('[data-delta]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const d = parseFloat(btn.dataset.delta);
-      let next = Math.max(0, (state.target || 0) + d);
-      // snap to 2.5
-      next = Math.round(next / STEP) * STEP;
-      state.target = next;
-      saveTarget(next);
-      targetInput.value = next;
-      render();
-    });
+  // Big +/-10 buttons (hardcoded in HTML)
+  document.querySelectorAll('.delta-big[data-delta]').forEach(btn => {
+    btn.addEventListener('click', () => applyDelta(parseFloat(btn.dataset.delta)));
   });
 
   document.getElementById('configBtn').addEventListener('click', openConfig);
@@ -743,7 +1017,7 @@ function init() {
   });
   document.getElementById('addMachineBtn').addEventListener('click', () => {
     const id = 'm-' + Math.random().toString(36).slice(2, 8);
-    state.machines.push({ id, name: 'New Machine', type: 'standard' });
+    state.machines.push({ id, name: 'New Machine', type: 'plate-loaded' });
     saveMachines(state.machines);
     renderMachineList();
     attachMachineListeners();
@@ -764,6 +1038,7 @@ function closeConfig() {
     saveActive(state.activeId);
   }
   renderMachineSelect();
+  renderDeltaButtons();
   render();
 }
 
@@ -771,11 +1046,36 @@ function attachMachineListeners() {
   document.querySelectorAll('.machine-item').forEach(item => {
     const id = item.dataset.id;
     item.querySelectorAll('[data-field]').forEach(input => {
-      input.addEventListener('input', () => {
+      const field = input.dataset.field;
+      const eventType = input.tagName === 'SELECT' ? 'change' : 'input';
+      input.addEventListener(eventType, () => {
         const m = state.machines.find(x => x.id === id);
         if (!m) return;
-        m[input.dataset.field] = input.value;
+        let value = input.value;
+        if (['barWeight', 'leftHandle', 'rightHandle'].includes(field)) {
+          value = parseFloat(value);
+          if (!Number.isFinite(value) || value < 0) value = 0;
+        }
+        m[field] = value;
+        // Seed sensible defaults when switching into a type that needs them
+        if (field === 'type') {
+          if ((value === 'smith' || value === 'barbell') && m.barWeight == null) m.barWeight = 45;
+          if (value === 'smith-iso') {
+            if (m.leftHandle == null) m.leftHandle = 45;
+            if (m.rightHandle == null) m.rightHandle = 45;
+          }
+        }
         saveMachines(state.machines);
+        if (field === 'type') {
+          renderMachineList();
+          attachMachineListeners();
+        }
+        // Live-update main view if this is the active machine
+        if (id === state.activeId) {
+          renderMachineSelect();
+          renderDeltaButtons();
+          render();
+        }
       });
     });
     const delBtn = item.querySelector('[data-action="delete"]');
@@ -793,4 +1093,3 @@ init();
 </script>
 </body>
 </html>
-
