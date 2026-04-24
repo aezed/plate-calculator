@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e0e0d">
+<title>PLATE CALC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0d;
+    --card: #181816;
+    --card-deep: #121210;
+    --border: #2a2a27;
+    --border-hot: #3d3d38;
+    --text: #e8e6df;
+    --text-dim: #8a877c;
+    --text-faint: #504e47;
+    --accent: #e6c547;
+    --accent-soft: #8a7a2a;
+    --red: #c94b3a;
+    --green: #7a9e56;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-weight: 400;
+    min-height: 100vh;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(230, 197, 71, 0.02) 0%, transparent 40%),
+      repeating-linear-gradient(0deg, transparent 0 2px, rgba(255,255,255,0.008) 2px 3px);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
+  }
+
+  button, input, select {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    outline: none;
+  }
+
+  button { cursor: pointer; }
+  input { -webkit-appearance: none; appearance: none; }
+
+  #app {
+    max-width: 540px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* --- Header --- */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+
+  .brand {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    color: var(--text-faint);
+  }
+  .brand b { color: var(--accent); font-weight: 700; }
+
+  .machine-picker {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 0 12px;
+    height: 42px;
+    position: relative;
+  }
+  .machine-picker select {
+    flex: 1;
+    height: 100%;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding-right: 20px;
+    background: transparent;
+    appearance: none;
+  }
+  .machine-picker::after {
+    content: '▾';
+    position: absolute;
+    right: 12px;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+
+  .icon-btn {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 18px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .icon-btn:hover, .icon-btn:active { color: var(--accent); border-color: var(--border-hot); }
+
+  /* --- Target input --- */
+  main {
+    padding: 20px 16px;
+    flex: 1;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .target-row {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .target-input {
+    background: var(--card);
+    border: 1px solid var(--border);
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  #target {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-size: 48px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    background: transparent;
+    padding: 0 8px;
+  }
+  #target::-webkit-outer-spin-button,
+  #target::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .unit-tag {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.15em;
+  }
+
+  .delta-big, .delta-small {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.1s, color 0.1s, border-color 0.1s;
+  }
+  .delta-big { height: 84px; font-size: 14px; }
+  .delta-small { height: 38px; }
+
+  .delta-big:active, .delta-small:active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .delta-small-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  /* --- Output --- */
+  .output {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 18px 16px 20px;
+    position: relative;
+  }
+
+  .total-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+  }
+  .total-label {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    color: var(--text-faint);
+    font-weight: 600;
+  }
+  .total-value {
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .total-value.exact { color: var(--green); }
+  .miss {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    letter-spacing: 0.06em;
+  }
+  .miss.off { color: var(--red); }
+  .miss.exact { color: var(--green); }
+
+  .pegs {
+    display: grid;
+    gap: 14px;
+  }
+  .pegs.two { grid-template-columns: 1fr 1fr; }
+
+  .peg {
+    background: var(--card-deep);
+    border: 1px solid var(--border);
+    padding: 14px 12px;
+  }
+  .peg-label {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--text-faint);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .peg-weight {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .peg-weight .unit {
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-left: 4px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+  }
+  .peg-plates {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+  }
+  .peg-plates .empty {
+    color: var(--text-faint);
+    font-style: italic;
+  }
+  .peg-plates .plate-chip {
+    display: inline-block;
+    padding: 1px 6px;
+    margin: 2px 3px 2px 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .machine-meta {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+  }
+  .machine-meta span b { color: var(--text-dim); font-weight: 500; }
+
+  /* --- Config dialog --- */
+  .config-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    display: none;
+    overflow-y: auto;
+    padding: 20px 16px 40px;
+  }
+  .config-overlay.open { display: block; }
+  .config-panel {
+    max-width: 540px;
+    margin: 0 auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+  .config-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .config-head h2 {
+    font-size: 13px;
+    letter-spacing: 0.24em;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .close-btn {
+    color: var(--text-dim);
+    font-size: 22px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .machine-list {
+    padding: 8px;
+  }
+  .machine-item {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .machine-item:last-child { border-bottom: none; }
+  .machine-item .row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .machine-item input[type="text"] {
+    flex: 1;
+    background: var(--card-deep);
+    border: 1px solid var(--border);
+    padding: 0 10px;
+    height: 36px;
+    font-size: 14px;
+  }
+  .machine-item input[type="text"]:focus { border-color: var(--accent); }
+  .machine-item select {
+    background: var(--card-deep);
+    border: 1px solid var(--border);
+    padding: 0 10px;
+    height: 36px;
+    font-size: 13px;
+    min-width: 150px;
+  }
+  .delete-btn {
+    color: var(--red);
+    font-size: 18px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    background: var(--card-deep);
+  }
+
+  .add-machine {
+    margin: 12px;
+    height: 44px;
+    border: 1px dashed var(--border-hot);
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+  }
+  .add-machine:hover { color: var(--accent); border-color: var(--accent-soft); }
+
+  .about {
+    padding: 16px;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--text-faint);
+    letter-spacing: 0.04em;
+    border-top: 1px solid var(--border);
+  }
+  .about b { color: var(--text-dim); font-weight: 500; }
+
+  /* --- Small screens --- */
+  @media (max-width: 380px) {
+    #target { font-size: 42px; }
+    .total-value { font-size: 30px; }
+    .peg-weight { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="machine-picker">
+      <select id="machineSelect" aria-label="Select machine"></select>
+    </div>
+    <button class="icon-btn" id="configBtn" aria-label="Configure machines">⚙</button>
+  </header>
+
+  <main>
+    <div class="section-label">TARGET · PLATE WEIGHT</div>
+    <div class="target-row">
+      <button class="delta-big" data-delta="-10">−10</button>
+      <div class="target-input">
+        <input type="number" id="target" step="2.5" inputmode="decimal" value="135" min="0">
+        <span class="unit-tag">LB</span>
+      </div>
+      <button class="delta-big" data-delta="10">+10</button>
+    </div>
+    <div class="delta-small-row">
+      <button class="delta-small" data-delta="-5">−5</button>
+      <button class="delta-small" data-delta="-2.5">−2.5</button>
+      <button class="delta-small" data-delta="2.5">+2.5</button>
+      <button class="delta-small" data-delta="5">+5</button>
+    </div>
+
+    <div class="output" id="output"><!-- populated --></div>
+  </main>
+</div>
+
+<div class="config-overlay" id="configOverlay">
+  <div class="config-panel">
+    <div class="config-head">
+      <h2>MACHINES</h2>
+      <button class="close-btn" id="closeConfigBtn">✕</button>
+    </div>
+    <div class="machine-list" id="machineList"></div>
+    <button class="add-machine" id="addMachineBtn">+ ADD MACHINE</button>
+    <div class="about">
+      <b>PLATES</b> 45 · 25 · 10 · 5 · 2.5 lb (unbounded)<br>
+      <b>STANDARD</b> plates both sides, equal · total = 2 × per-side<br>
+      <b>PRIME 2-PEG</b> 3:1 ratio (top = 3 × middle) · total = 4M<br>
+      <b>PRIME 2-PEG ISO</b> same ratio, both sides · total = 8M
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   PLATE CALC — solver + UI state
+   ============================================================ */
+
+const PLATES = [45, 25, 10, 5, 2.5];
+const STEP = 2.5; // smallest available increment
+
+const MACHINE_TYPES = {
+  'standard':          { label: 'Barbell / Smith / Plate-loaded' },
+  'prime-bilateral':   { label: 'Prime 2-Peg (Bilateral)' },
+  'prime-isolateral':  { label: 'Prime 2-Peg (Isolateral)' },
+};
+
+const DEFAULT_MACHINES = [
+  { id: 'm-bar',      name: 'Barbell / Smith',      type: 'standard' },
+  { id: 'm-plate',    name: 'Plate-loaded Machine', type: 'standard' },
+  { id: 'm-prime',    name: 'Prime 2-Peg',          type: 'prime-bilateral' },
+  { id: 'm-prime-iso',name: 'Prime 2-Peg (Iso)',    type: 'prime-isolateral' },
+];
+
+/* ---------- storage ---------- */
+const LS_MACHINES = 'plateCalc.machines.v1';
+const LS_ACTIVE   = 'plateCalc.active.v1';
+const LS_TARGET   = 'plateCalc.target.v1';
+
+function loadMachines() {
+  try {
+    const raw = localStorage.getItem(LS_MACHINES);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [...DEFAULT_MACHINES];
+}
+function saveMachines(m) { localStorage.setItem(LS_MACHINES, JSON.stringify(m)); }
+function loadActive() { return localStorage.getItem(LS_ACTIVE) || DEFAULT_MACHINES[0].id; }
+function saveActive(id) { localStorage.setItem(LS_ACTIVE, id); }
+function loadTarget() {
+  const v = parseFloat(localStorage.getItem(LS_TARGET));
+  return Number.isFinite(v) && v > 0 ? v : 135;
+}
+function saveTarget(v) { localStorage.setItem(LS_TARGET, String(v)); }
+
+/* ---------- solver ---------- */
+
+function decompose(weight) {
+  // weight assumed multiple of 2.5, >= 0
+  const out = [];
+  let rem = Math.round(weight * 10) / 10;
+  for (const p of PLATES) {
+    const n = Math.floor(rem / p + 1e-9);
+    if (n > 0) {
+      out.push({ plate: p, count: n });
+      rem = Math.round((rem - n * p) * 10) / 10;
+    }
+  }
+  return out;
+}
+
+function roundStep(v, step = STEP) {
+  return Math.round(v / step) * step;
+}
+
+function solve(target, type) {
+  if (!target || target < 0) target = 0;
+
+  if (type === 'standard') {
+    // Total = 2 * perSide.  perSide in steps of 2.5 (>= 0).
+    // So achievable totals are multiples of 5.
+    const best = Math.max(0, roundStep(target, 5));
+    const perSide = best / 2;
+    return {
+      kind: 'standard',
+      total: best,
+      miss: best - target,
+      perSide,
+      loadout: decompose(perSide),
+    };
+  }
+
+  if (type === 'prime-bilateral') {
+    // Total = 4M, M >= 2.5 in steps of 2.5.
+    // Achievable totals: 10, 20, 30, 40, ... (multiples of 10, min 10)
+    let M = Math.max(STEP, roundStep(target / 4));
+    return {
+      kind: 'prime-bilateral',
+      total: M * 4,
+      miss: M * 4 - target,
+      middle: M,
+      top: M * 3,
+      middleLoadout: decompose(M),
+      topLoadout: decompose(M * 3),
+    };
+  }
+
+  if (type === 'prime-isolateral') {
+    // Total = 8M. Achievable totals: 20, 40, 60, ... (multiples of 20, min 20)
+    let M = Math.max(STEP, roundStep(target / 8));
+    return {
+      kind: 'prime-isolateral',
+      total: M * 8,
+      miss: M * 8 - target,
+      middle: M,
+      top: M * 3,
+      perSide: M * 4,
+      middleLoadout: decompose(M),
+      topLoadout: decompose(M * 3),
+    };
+  }
+}
+
+/* ---------- formatting ---------- */
+
+function fmtNum(n) {
+  if (n === 0) return '0';
+  return Number.isInteger(n) ? String(n) : n.toFixed(1).replace(/\.0$/, '');
+}
+
+function fmtSigned(n) {
+  if (n === 0) return 'EXACT';
+  const sign = n > 0 ? '+' : '−';
+  return `${sign}${fmtNum(Math.abs(n))}`;
+}
+
+function renderLoadout(breakdown) {
+  if (breakdown.length === 0) {
+    return '<span class="empty">empty</span>';
+  }
+  return breakdown
+    .map(({ plate, count }) => {
+      const label = count > 1 ? `${count} × ${fmtNum(plate)}` : `${fmtNum(plate)}`;
+      return `<span class="plate-chip">${label}</span>`;
+    })
+    .join('');
+}
+
+/* ---------- rendering ---------- */
+
+function render() {
+  const target = state.target;
+  const machine = state.machines.find(m => m.id === state.activeId) || state.machines[0];
+  const result = solve(target, machine.type);
+  const off = Math.abs(result.miss) > 0.01;
+
+  let pegsHtml = '';
+  if (result.kind === 'standard') {
+    pegsHtml = `
+      <div class="pegs">
+        <div class="peg">
+          <div class="peg-label">PER SIDE · ×2</div>
+          <div class="peg-weight">${fmtNum(result.perSide)}<span class="unit">LB</span></div>
+          <div class="peg-plates">${renderLoadout(result.loadout)}</div>
+        </div>
+      </div>`;
+  } else {
+    const sideNote = result.kind === 'prime-isolateral'
+      ? `<span><b>PER SIDE</b> ${fmtNum(result.perSide)} LB · ×2 SIDES</span>`
+      : `<span><b>SINGLE SET</b> OF PEGS</span>`;
+    pegsHtml = `
+      <div class="pegs two">
+        <div class="peg">
+          <div class="peg-label">MIDDLE · ${result.kind === 'prime-isolateral' ? 'PER SIDE' : ''}</div>
+          <div class="peg-weight">${fmtNum(result.middle)}<span class="unit">LB</span></div>
+          <div class="peg-plates">${renderLoadout(result.middleLoadout)}</div>
+        </div>
+        <div class="peg">
+          <div class="peg-label">TOP · ${result.kind === 'prime-isolateral' ? 'PER SIDE' : ''}</div>
+          <div class="peg-weight">${fmtNum(result.top)}<span class="unit">LB</span></div>
+          <div class="peg-plates">${renderLoadout(result.topLoadout)}</div>
+        </div>
+      </div>
+      <div class="machine-meta">
+        ${sideNote}
+        <span><b>RATIO</b> 3:1</span>
+      </div>`;
+  }
+
+  const output = document.getElementById('output');
+  output.innerHTML = `
+    <div class="total-row">
+      <div>
+        <div class="total-label">ACHIEVABLE</div>
+        <div class="total-value ${off ? '' : 'exact'}">${fmtNum(result.total)}<span class="unit" style="font-size:12px;color:var(--text-faint);margin-left:6px;letter-spacing:0.15em;">LB</span></div>
+        <div class="miss ${off ? 'off' : 'exact'}">${fmtSigned(result.miss)}${off ? ' OFF TARGET' : ''}</div>
+      </div>
+    </div>
+    ${pegsHtml}
+  `;
+}
+
+function renderMachineSelect() {
+  const sel = document.getElementById('machineSelect');
+  sel.innerHTML = state.machines
+    .map(m => `<option value="${m.id}" ${m.id === state.activeId ? 'selected' : ''}>${m.name}</option>`)
+    .join('');
+}
+
+function renderMachineList() {
+  const list = document.getElementById('machineList');
+  list.innerHTML = state.machines.map((m, i) => `
+    <div class="machine-item" data-id="${m.id}">
+      <div class="row">
+        <input type="text" value="${escapeHtml(m.name)}" data-field="name" placeholder="Machine name">
+        <button class="delete-btn" data-action="delete" aria-label="Delete machine">✕</button>
+      </div>
+      <div class="row">
+        <select data-field="type">
+          ${Object.entries(MACHINE_TYPES).map(([k, v]) =>
+            `<option value="${k}" ${k === m.type ? 'selected' : ''}>${v.label}</option>`
+          ).join('')}
+        </select>
+      </div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+/* ---------- state + events ---------- */
+
+const state = {
+  machines: loadMachines(),
+  activeId: loadActive(),
+  target: loadTarget(),
+};
+
+// ensure active is valid
+if (!state.machines.find(m => m.id === state.activeId)) {
+  state.activeId = state.machines[0]?.id;
+}
+
+function init() {
+  renderMachineSelect();
+  document.getElementById('target').value = state.target;
+  render();
+
+  document.getElementById('machineSelect').addEventListener('change', e => {
+    state.activeId = e.target.value;
+    saveActive(state.activeId);
+    render();
+  });
+
+  const targetInput = document.getElementById('target');
+  targetInput.addEventListener('input', e => {
+    const v = parseFloat(e.target.value);
+    if (Number.isFinite(v)) {
+      state.target = v;
+      saveTarget(v);
+      render();
+    }
+  });
+  targetInput.addEventListener('focus', e => e.target.select());
+
+  document.querySelectorAll('[data-delta]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const d = parseFloat(btn.dataset.delta);
+      let next = Math.max(0, (state.target || 0) + d);
+      // snap to 2.5
+      next = Math.round(next / STEP) * STEP;
+      state.target = next;
+      saveTarget(next);
+      targetInput.value = next;
+      render();
+    });
+  });
+
+  document.getElementById('configBtn').addEventListener('click', openConfig);
+  document.getElementById('closeConfigBtn').addEventListener('click', closeConfig);
+  document.getElementById('configOverlay').addEventListener('click', e => {
+    if (e.target.id === 'configOverlay') closeConfig();
+  });
+  document.getElementById('addMachineBtn').addEventListener('click', () => {
+    const id = 'm-' + Math.random().toString(36).slice(2, 8);
+    state.machines.push({ id, name: 'New Machine', type: 'standard' });
+    saveMachines(state.machines);
+    renderMachineList();
+    attachMachineListeners();
+  });
+}
+
+function openConfig() {
+  renderMachineList();
+  attachMachineListeners();
+  document.getElementById('configOverlay').classList.add('open');
+}
+
+function closeConfig() {
+  document.getElementById('configOverlay').classList.remove('open');
+  // ensure active still valid
+  if (!state.machines.find(m => m.id === state.activeId)) {
+    state.activeId = state.machines[0]?.id;
+    saveActive(state.activeId);
+  }
+  renderMachineSelect();
+  render();
+}
+
+function attachMachineListeners() {
+  document.querySelectorAll('.machine-item').forEach(item => {
+    const id = item.dataset.id;
+    item.querySelectorAll('[data-field]').forEach(input => {
+      input.addEventListener('input', () => {
+        const m = state.machines.find(x => x.id === id);
+        if (!m) return;
+        m[input.dataset.field] = input.value;
+        saveMachines(state.machines);
+      });
+    });
+    const delBtn = item.querySelector('[data-action="delete"]');
+    delBtn.addEventListener('click', () => {
+      if (state.machines.length <= 1) return;
+      state.machines = state.machines.filter(m => m.id !== id);
+      saveMachines(state.machines);
+      renderMachineList();
+      attachMachineListeners();
+    });
+  });
+}
+
+init();
+</script>
+</body>
+</html>
+
