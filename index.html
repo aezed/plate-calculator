@@ -33,6 +33,10 @@
     --plate-blue-border: #2f5a82;
     --plate-green: #6fb559;
     --plate-green-border: #3d6f32;
+    --plate-dark: #3a3a36;
+    --plate-dark-border: #1c1c1a;
+    --plate-silver: #b0ada0;
+    --plate-silver-border: #6a675f;
     --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   }
 
@@ -174,7 +178,7 @@
   .target-input {
     background: var(--card);
     border: 1px solid var(--border);
-    height: 52px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -185,7 +189,7 @@
     width: 100%;
     height: 100%;
     text-align: center;
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 500;
     letter-spacing: -0.01em;
     color: var(--text);
@@ -197,9 +201,9 @@
 
   .unit-tag {
     position: absolute;
-    right: 8px;
-    bottom: 4px;
-    font-size: 9px;
+    right: 6px;
+    bottom: 3px;
+    font-size: 8px;
     color: var(--text-faint);
     letter-spacing: 0.15em;
   }
@@ -212,7 +216,7 @@
     font-weight: 500;
     transition: background 0.1s, color 0.1s, border-color 0.1s;
   }
-  .delta-big { height: 52px; font-size: 13px; }
+  .delta-big { height: 42px; font-size: 13px; }
   .delta-small { height: 32px; }
 
   .delta-big:active, .delta-small:active {
@@ -274,101 +278,121 @@
   .peg {
     background: var(--card-deep);
     border: 1px solid var(--border);
-    padding: 10px 12px 12px;
+    padding: 8px 12px 10px;
   }
   .peg-label {
     font-size: 10px;
     letter-spacing: 0.22em;
     color: var(--text-faint);
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+  }
+
+  .peg.peg-side {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
+    align-items: stretch;
+    padding: 8px 10px 8px 8px;
     gap: 10px;
-    flex-wrap: wrap;
   }
-  .peg-label .weight-inline {
-    color: var(--text-dim);
-    letter-spacing: 0.08em;
-    font-weight: 500;
+  .peg-side-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
     font-size: 10px;
-    white-space: nowrap;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--text-faint);
+    padding-right: 8px;
+    border-right: 1px solid var(--border);
+    align-self: stretch;
+    min-width: 14px;
+    line-height: 1.1;
   }
-  .peg-label .weight-inline b {
-    color: var(--text);
-    font-weight: 600;
-    font-size: 15px;
-    letter-spacing: -0.01em;
-    margin-right: 2px;
+  .peg-side-label span {
+    display: block;
   }
 
   .peg-plates {
     display: flex;
     flex-wrap: wrap;
-    gap: 7px;
+    gap: 2px;
     align-items: center;
-    min-height: 72px;
+    min-height: 80px;
+    flex: 1;
   }
   .peg-plates .empty {
     color: var(--text-faint);
     font-style: italic;
-    font-size: 13px;
+    font-size: 12px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
+    padding-left: 4px;
   }
+
   .plate-chip {
     display: inline-flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: center;
-    min-width: 68px;
-    height: 72px;
-    padding: 0 12px;
-    background: var(--card);
-    border: 1px solid var(--border-hot);
-    color: var(--text);
-    font-size: 34px;
+    width: 24px;
+    background: var(--text);
+    border: 1px solid var(--text-faint);
+    color: var(--bg);
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
-    line-height: 72px;
+    border-radius: 3px;
   }
-  .plate-chip .count {
-    color: var(--text-dim);
-    font-size: 22px;
-    font-weight: 600;
-    margin-right: 6px;
-    letter-spacing: 0.01em;
-  }
+  .plate-chip.h-45   { height: 80px; font-size: 14px; }
+  .plate-chip.h-25   { height: 66px; font-size: 14px; }
+  .plate-chip.h-10   { height: 54px; font-size: 13px; }
+  .plate-chip.h-5    { height: 46px; font-size: 13px; }
+  .plate-chip.h-2-5  { height: 38px; font-size: 10px; }
+  .plate-chip.h-1-25 { height: 32px; font-size: 9px; }
+
   .plate-chip.c-blue {
-    color: var(--plate-blue);
+    background: var(--plate-blue);
     border-color: var(--plate-blue-border);
+    color: var(--bg);
   }
   .plate-chip.c-green {
-    color: var(--plate-green);
+    background: var(--plate-green);
     border-color: var(--plate-green-border);
+    color: var(--bg);
+  }
+  .plate-chip.c-dark {
+    background: var(--plate-dark);
+    border-color: var(--plate-dark-border);
+    color: var(--text);
+  }
+  .plate-chip.c-silver {
+    background: var(--plate-silver);
+    border-color: var(--plate-silver-border);
+    color: var(--bg);
   }
 
   .voltra-chip {
     display: inline-flex;
     align-items: baseline;
     justify-content: center;
-    min-width: 140px;
-    height: 86px;
-    padding: 0 22px;
+    min-width: 100px;
+    height: 60px;
+    padding: 0 16px;
     background: var(--card);
     border: 1px solid var(--border-hot);
     color: var(--text);
-    font-size: 52px;
+    font-size: 34px;
     font-weight: 700;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
-    line-height: 86px;
+    line-height: 60px;
   }
   .voltra-chip .unit {
-    font-size: 14px;
+    font-size: 11px;
     color: var(--text-faint);
-    margin-left: 10px;
+    margin-left: 8px;
     letter-spacing: 0.15em;
     font-weight: 500;
   }
@@ -516,12 +540,17 @@
 
   /* --- Small screens --- */
   @media (max-width: 380px) {
-    #target { font-size: 26px; }
+    #target { font-size: 20px; }
     .total-value { font-size: 20px; }
-    .plate-chip { height: 62px; min-width: 58px; font-size: 28px; line-height: 62px; padding: 0 9px; }
-    .plate-chip .count { font-size: 18px; }
-    .voltra-chip { height: 72px; min-width: 120px; font-size: 42px; line-height: 72px; padding: 0 16px; }
-    .peg-plates { min-height: 62px; }
+    .plate-chip       { width: 22px; font-size: 12px; }
+    .plate-chip.h-45   { height: 70px; font-size: 13px; }
+    .plate-chip.h-25   { height: 58px; font-size: 13px; }
+    .plate-chip.h-10   { height: 48px; font-size: 12px; }
+    .plate-chip.h-5    { height: 42px; font-size: 12px; }
+    .plate-chip.h-2-5  { height: 34px; font-size: 9px; }
+    .plate-chip.h-1-25 { height: 28px; font-size: 8px; }
+    .voltra-chip { height: 54px; min-width: 90px; font-size: 28px; line-height: 54px; padding: 0 12px; }
+    .peg-plates { min-height: 70px; }
   }
 </style>
 </head>
@@ -788,14 +817,28 @@ function renderLoadout(breakdown) {
   if (breakdown.length === 0) {
     return '<span class="empty">empty</span>';
   }
-  return breakdown
-    .map(({ plate, count }) => {
-      const countHtml = count > 1 ? `<span class="count">${count}×</span>` : '';
-      const colorClass = plate === 45 ? ' c-blue' : plate === 25 ? ' c-green' : '';
-      return `<span class="plate-chip${colorClass}">${countHtml}${fmtNum(plate)}</span>`;
-    })
-    .join('');
+  const chips = [];
+  for (const { plate, count } of breakdown) {
+    const colorClass =
+      plate === 45  ? ' c-blue'   :
+      plate === 25  ? ' c-green'  :
+      plate === 5   ? ' c-dark'   :
+      plate === 2.5 ? ' c-silver' : '';
+    // Size class mirrors physical plate diameter so chips read as a stack.
+    const sizeClass =
+      plate === 45    ? 'h-45'   :
+      plate === 25    ? 'h-25'   :
+      plate === 10    ? 'h-10'   :
+      plate === 5     ? 'h-5'    :
+      plate === 2.5   ? 'h-2-5'  :
+      plate === 1.25  ? 'h-1-25' : 'h-5';
+    for (let i = 0; i < count; i++) {
+      chips.push(`<span class="plate-chip ${sizeClass}${colorClass}">${fmtNum(plate)}</span>`);
+    }
+  }
+  return chips.join('');
 }
+
 
 /* ---------- rendering ---------- */
 
@@ -807,12 +850,19 @@ function render() {
 
   const peg = (label, weight, loadoutHtml) => `
     <div class="peg">
-      <div class="peg-label">
-        <span>${label}</span>
-        <span class="weight-inline"><b>${fmtNum(weight)}</b>LB</span>
-      </div>
+      <div class="peg-label"><span>${label}</span></div>
       <div class="peg-plates">${loadoutHtml}</div>
     </div>`;
+
+  // Variant for Prime pegs: vertical side label, more room for chips.
+  const pegSide = (label, loadoutHtml) => {
+    const letters = label.split('').map(c => `<span>${c}</span>`).join('');
+    return `
+    <div class="peg peg-side">
+      <div class="peg-side-label">${letters}</div>
+      <div class="peg-plates">${loadoutHtml}</div>
+    </div>`;
+  };
 
   let pegsHtml = '';
   if (result.kind === 'plate-loaded') {
@@ -854,8 +904,8 @@ function render() {
       : `<b>RATIO</b> 3:1`;
     pegsHtml = `
       <div class="pegs">
-        ${peg('TOP', result.top, renderLoadout(result.topLoadout))}
-        ${peg('MIDDLE', result.middle, renderLoadout(result.middleLoadout))}
+        ${pegSide('TOP', renderLoadout(result.topLoadout))}
+        ${pegSide('MID', renderLoadout(result.middleLoadout))}
       </div>
       <div class="machine-meta">
         <span><b>SINGLE SET</b> OF PEGS</span>
@@ -867,8 +917,8 @@ function render() {
       : `<b>RATIO</b> 3:1`;
     pegsHtml = `
       <div class="pegs">
-        ${peg('TOP · PER SIDE', result.top, renderLoadout(result.topLoadout))}
-        ${peg('MIDDLE · PER SIDE', result.middle, renderLoadout(result.middleLoadout))}
+        ${pegSide('TOP', renderLoadout(result.topLoadout))}
+        ${pegSide('MID', renderLoadout(result.middleLoadout))}
       </div>
       <div class="machine-meta">
         <span><b>PER SIDE</b> ${fmtNum(result.perSide)} LB · ×2</span>
