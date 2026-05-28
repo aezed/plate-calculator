@@ -1,5 +1,5 @@
 // Bump this version whenever you update the app to force a refresh.
-const VERSION = 'v1';
+const VERSION = 'v9';
 const CACHE = `plate-calc-${VERSION}`;
 
 const ASSETS = [
