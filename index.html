@@ -37,6 +37,10 @@
     --plate-dark-border: #1c1c1a;
     --plate-silver: #b0ada0;
     --plate-silver-border: #6a675f;
+    --plate-red: #c94b3a;
+    --plate-red-border: #7a2b21;
+    --plate-yellow: #d4b53d;
+    --plate-yellow-border: #826d1a;
     --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   }
 
@@ -103,6 +107,69 @@
   .title-text b {
     color: var(--accent);
     font-weight: 700;
+  }
+  .title-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .unit-toggle {
+    display: inline-flex;
+    background: var(--card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    height: 36px;
+  }
+  .unit-btn {
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--text-faint);
+    background: transparent;
+    transition: background 0.1s, color 0.1s;
+    min-width: 34px;
+  }
+  .unit-btn:not(:last-child) {
+    border-right: 1px solid var(--border);
+  }
+  .unit-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .opt-btn {
+    height: 36px;
+    padding: 0 9px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    display: none;
+    align-items: center;
+    transition: color 0.1s, background 0.1s, border-color 0.1s;
+  }
+  .opt-btn::before {
+    content: '✕';
+    margin-right: 4px;
+    font-size: 10px;
+    opacity: 0.7;
+  }
+  .opt-btn.active {
+    color: var(--text);
+    background: var(--card);
+    border-color: var(--border-hot);
+  }
+  .opt-btn.active::before {
+    content: '✓';
+    color: var(--accent);
+    opacity: 1;
+  }
+  .opt-btn.visible {
+    display: inline-flex;
   }
 
   .machine-row {
@@ -231,6 +298,18 @@
     gap: 6px;
     margin-bottom: 14px;
   }
+
+  .kg-readout {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    margin: -2px 0 6px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    min-height: 14px;
+  }
+  .kg-readout b { color: var(--text); font-weight: 600; }
+  .kg-readout:empty { display: none; }
 
   /* --- Output --- */
   .output {
@@ -372,6 +451,26 @@
     border-color: var(--plate-silver-border);
     color: var(--bg);
   }
+  .plate-chip.c-red {
+    background: var(--plate-red);
+    border-color: var(--plate-red-border);
+    color: var(--bg);
+  }
+  .plate-chip.c-yellow {
+    background: var(--plate-yellow);
+    border-color: var(--plate-yellow-border);
+    color: var(--bg);
+  }
+
+  /* KG plate heights — mirrors physical IPF plate diameters */
+  .plate-chip.h-kg-25    { height: 80px; font-size: 14px; }
+  .plate-chip.h-kg-20    { height: 76px; font-size: 14px; }
+  .plate-chip.h-kg-15    { height: 70px; font-size: 14px; }
+  .plate-chip.h-kg-10    { height: 60px; font-size: 14px; }
+  .plate-chip.h-kg-5     { height: 50px; font-size: 13px; }
+  .plate-chip.h-kg-2-5   { height: 42px; font-size: 11px; }
+  .plate-chip.h-kg-1-25  { height: 36px; font-size: 10px; }
+  .plate-chip.h-kg-0-5   { height: 30px; font-size: 9px; }
 
   .voltra-chip {
     display: inline-flex;
@@ -559,7 +658,14 @@
   <header>
     <div class="app-title">
       <span class="title-text">PLATE <b>CALCULATOR</b></span>
-      <button class="icon-btn" id="configBtn" aria-label="Configure machines">⚙</button>
+      <div class="title-controls">
+        <div class="unit-toggle" id="unitToggle" role="group" aria-label="Unit toggle">
+          <button class="unit-btn" data-unit="lb">LB</button>
+          <button class="unit-btn" data-unit="kg">KG</button>
+        </div>
+        <button class="opt-btn" id="has25kgBtn" aria-label="Toggle 25kg plate availability" title="Gym has 25 kg plates">25</button>
+        <button class="icon-btn" id="configBtn" aria-label="Configure machines">⚙</button>
+      </div>
     </div>
     <div class="machine-row">
       <div class="section-label">MACHINE</div>
@@ -579,6 +685,7 @@
       </div>
       <button class="delta-big" data-delta="10">+10</button>
     </div>
+    <div class="kg-readout" id="kgReadout"></div>
     <div class="delta-small-row" id="deltaSmallRow"></div>
 
     <div class="output" id="output"><!-- populated --></div>
@@ -594,12 +701,14 @@
     <div class="machine-list" id="machineList"></div>
     <button class="add-machine" id="addMachineBtn">+ ADD MACHINE</button>
     <div class="about">
-      <b>PLATES</b> 45 · 25 · 10 · 5 · 2.5 lb (unbounded)<br>
+      <b>PLATES (LB)</b> 45 · 25 · 10 · 5 · 2.5 lb (unbounded)<br>
       <b>BARBELL ALSO</b> 1.25 lb micro plates (2.5 lb total steps)<br>
+      <b>PLATES (KG)</b> 25 · 20 · 15 · 10 · 5 · 2.5 · 1.25 · 0.5 kg<br>
+      <b>KG MODE</b> target stays LB · barbell uses KG plates · 1 KG total steps<br>
       <b>PLATE-LOADED</b> symmetric · total = 2 × per-side<br>
       <b>PRIME 2-PEG</b> 3:1 ratio · exact hit via top-peg overload<br>
       <b>PRIME 2-PEG ISO</b> 3:1 both sides · exact hit via top-peg overload<br>
-      <b>BARBELL</b> plate-loaded + editable bar weight<br>
+      <b>BARBELL</b> plate-loaded + editable bar (LB and KG)<br>
       <b>SMITH (VOLTRA)</b> 5 lb per-side min · 2 lb steps · rounds up<br>
       <b>SMITH ISO (VOLTRA)</b> symmetric handles · rounds up
     </div>
@@ -613,6 +722,9 @@
 
 const PLATES = [45, 25, 10, 5, 2.5];
 const BARBELL_PLATES = [45, 25, 10, 5, 2.5, 1.25];
+const KG_PLATES = [25, 20, 15, 10, 5, 2.5, 1.25, 0.5];
+const KG_TO_LB = 2.20462;
+const LB_TO_KG = 1 / KG_TO_LB;
 const STEP = 2.5; // smallest available increment
 
 const MACHINE_TYPES = {
@@ -628,7 +740,7 @@ const DEFAULT_MACHINES = [
   { id: 'm-plate',     name: 'Plate-loaded',      type: 'plate-loaded' },
   { id: 'm-prime',     name: 'Prime 2-Peg',       type: 'prime-bilateral' },
   { id: 'm-prime-iso', name: 'Prime 2-Peg (Iso)', type: 'prime-isolateral' },
-  { id: 'm-barbell',   name: 'Barbell',           type: 'barbell', barWeight: 45 },
+  { id: 'm-barbell',   name: 'Barbell',           type: 'barbell', barWeight: 45, barWeightKg: 20 },
   { id: 'm-smith-iso', name: 'Smith (Iso)',       type: 'smith-iso', leftHandle: 45, rightHandle: 45 },
   { id: 'm-smith',     name: 'Smith',             type: 'smith', barWeight: 45 },
 ];
@@ -637,6 +749,8 @@ const DEFAULT_MACHINES = [
 const LS_MACHINES = 'plateCalc.machines.v1';
 const LS_ACTIVE   = 'plateCalc.active.v1';
 const LS_TARGET   = 'plateCalc.target.v1';
+const LS_UNIT     = 'plateCalc.unit.v1';
+const LS_HAS_25KG = 'plateCalc.has25kg.v1';
 
 function loadMachines() {
   try {
@@ -658,6 +772,16 @@ function loadTarget() {
   return Number.isFinite(v) && v > 0 ? v : 135;
 }
 function saveTarget(v) { localStorage.setItem(LS_TARGET, String(v)); }
+function loadUnit() {
+  const u = localStorage.getItem(LS_UNIT);
+  return u === 'kg' ? 'kg' : 'lb';
+}
+function saveUnit(u) { localStorage.setItem(LS_UNIT, u); }
+function loadHas25kg() {
+  const v = localStorage.getItem(LS_HAS_25KG);
+  return v === null ? true : v === 'true';
+}
+function saveHas25kg(v) { localStorage.setItem(LS_HAS_25KG, String(v)); }
 
 /* ---------- solver ---------- */
 
@@ -696,8 +820,30 @@ function solve(target, machine) {
   }
 
   if (type === 'barbell') {
-    // Specialty or standard barbell. Plate-loaded with 1.25 lb micro plates available:
-    // 1.25 lb per side => 2.5 lb total granularity.
+    if (state.unit === 'kg') {
+      // KG mode: target stays in lb; bar + plates are in kg.
+      // Bar weight in kg is stored separately (default 20 kg).
+      const barKg = machine.barWeightKg ?? 20;
+      const targetKg = target * LB_TO_KG;
+      const platesKgNeeded = Math.max(0, targetKg - barKg);
+      // Snap per-side to multiples of 0.5 kg (smallest kg plate).
+      const perSideKg = Math.round(platesKgNeeded / 2 / 0.5) * 0.5;
+      const totalKg = barKg + 2 * perSideKg;
+      const totalLb = totalKg * KG_TO_LB;
+      const activeKgPlates = state.has25kg ? KG_PLATES : KG_PLATES.filter(p => p !== 25);
+      return {
+        kind: 'barbell-kg',
+        unit: 'kg',
+        total: totalLb,
+        miss: totalLb - target,
+        perSide: perSideKg,
+        barWeight: barKg,
+        plateTotal: 2 * perSideKg,
+        totalKg,
+        loadout: decompose(perSideKg, activeKgPlates),
+      };
+    }
+    // LB mode (original behavior)
     const bar = machine.barWeight || 0;
     const platesNeeded = Math.max(0, target - bar);
     const plateTotal = roundStep(platesNeeded, 2.5);
@@ -705,6 +851,7 @@ function solve(target, machine) {
     const total = bar + plateTotal;
     return {
       kind: 'barbell',
+      unit: 'lb',
       total, miss: total - target,
       perSide, barWeight: bar, plateTotal,
       loadout: decompose(perSide, BARBELL_PLATES),
@@ -807,31 +954,57 @@ function fmtNum(n) {
   return n.toFixed(2).replace(/\.?0+$/, '');
 }
 
+function round1(n) {
+  return Math.round(n * 10) / 10;
+}
+
 function fmtSigned(n) {
   if (n === 0) return 'EXACT';
   const sign = n > 0 ? '+' : '−';
   return `${sign}${fmtNum(Math.abs(n))}`;
 }
 
-function renderLoadout(breakdown) {
+function renderLoadout(breakdown, unit = 'lb') {
   if (breakdown.length === 0) {
     return '<span class="empty">empty</span>';
   }
   const chips = [];
   for (const { plate, count } of breakdown) {
-    const colorClass =
-      plate === 45  ? ' c-blue'   :
-      plate === 25  ? ' c-green'  :
-      plate === 5   ? ' c-dark'   :
-      plate === 2.5 ? ' c-silver' : '';
-    // Size class mirrors physical plate diameter so chips read as a stack.
-    const sizeClass =
-      plate === 45    ? 'h-45'   :
-      plate === 25    ? 'h-25'   :
-      plate === 10    ? 'h-10'   :
-      plate === 5     ? 'h-5'    :
-      plate === 2.5   ? 'h-2-5'  :
-      plate === 1.25  ? 'h-1-25' : 'h-5';
+    let colorClass = '';
+    let sizeClass = 'h-5';
+    if (unit === 'kg') {
+      // KG color convention (common European commercial): 25 red, 20 blue,
+      // 15 yellow, 10 green, smaller plates neutral.
+      colorClass =
+        plate === 25   ? ' c-red'     :
+        plate === 20   ? ' c-blue'    :
+        plate === 15   ? ' c-yellow'  :
+        plate === 10   ? ' c-green'   :
+        plate === 5    ? ' c-dark'    :
+        plate === 2.5  ? ' c-silver'  : '';
+      sizeClass =
+        plate === 25   ? 'h-kg-25'   :
+        plate === 20   ? 'h-kg-20'   :
+        plate === 15   ? 'h-kg-15'   :
+        plate === 10   ? 'h-kg-10'   :
+        plate === 5    ? 'h-kg-5'    :
+        plate === 2.5  ? 'h-kg-2-5'  :
+        plate === 1.25 ? 'h-kg-1-25' :
+        plate === 0.5  ? 'h-kg-0-5'  : 'h-kg-5';
+    } else {
+      colorClass =
+        plate === 45  ? ' c-blue'   :
+        plate === 25  ? ' c-green'  :
+        plate === 5   ? ' c-dark'   :
+        plate === 2.5 ? ' c-silver' : '';
+      sizeClass =
+        plate === 45    ? 'h-45'   :
+        plate === 25    ? 'h-25'   :
+        plate === 10    ? 'h-10'   :
+        plate === 5     ? 'h-5'    :
+        plate === 2.5   ? 'h-2-5'  :
+        plate === 1.25  ? 'h-1-25' : 'h-5';
+    }
     for (let i = 0; i < count; i++) {
       chips.push(`<span class="plate-chip ${sizeClass}${colorClass}">${fmtNum(plate)}</span>`);
     }
@@ -842,7 +1015,27 @@ function renderLoadout(breakdown) {
 
 /* ---------- rendering ---------- */
 
+function renderUnitToggle() {
+  document.querySelectorAll('.unit-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.unit === state.unit);
+  });
+  const btn25 = document.getElementById('has25kgBtn');
+  btn25.classList.toggle('visible', state.unit === 'kg');
+  btn25.classList.toggle('active', state.has25kg);
+}
+
+function renderKgReadout() {
+  const el = document.getElementById('kgReadout');
+  if (state.unit === 'kg') {
+    const kg = round1(state.target * LB_TO_KG);
+    el.innerHTML = `<b>${fmtNum(state.target)}</b> LB = <b>${fmtNum(kg)}</b> KG`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+
 function render() {
+  renderKgReadout();
   const target = state.target;
   const machine = state.machines.find(m => m.id === state.activeId) || state.machines[0];
   const result = solve(target, machine);
@@ -873,6 +1066,13 @@ function render() {
       <div class="machine-meta">
         <span><b>BAR</b> ${fmtNum(result.barWeight)} LB</span>
         <span><b>PLATES</b> ${fmtNum(result.plateTotal)} LB</span>
+      </div>`;
+  } else if (result.kind === 'barbell-kg') {
+    pegsHtml = `
+      <div class="pegs">${peg('PER SIDE · ×2 · KG', result.perSide, renderLoadout(result.loadout, 'kg'))}</div>
+      <div class="machine-meta">
+        <span><b>BAR</b> ${fmtNum(result.barWeight)} KG (${fmtNum(round1(result.barWeight * KG_TO_LB))} LB)</span>
+        <span><b>TOTAL</b> ${fmtNum(round1(result.totalKg))} KG</span>
       </div>`;
   } else if (result.kind === 'smith') {
     pegsHtml = `
@@ -953,11 +1153,20 @@ function renderMachineList() {
     if (m.type === 'smith' || m.type === 'barbell') {
       extraFields = `
         <div class="row num-row">
-          <label class="field-label">BAR</label>
+          <label class="field-label">BAR (LB)</label>
           <input type="number" value="${m.barWeight ?? 45}" data-field="barWeight" step="0.5" min="0" inputmode="decimal" class="num-input">
           <span class="unit-label">LB</span>
         </div>
       `;
+      if (m.type === 'barbell') {
+        extraFields += `
+        <div class="row num-row">
+          <label class="field-label">BAR (KG)</label>
+          <input type="number" value="${m.barWeightKg ?? 20}" data-field="barWeightKg" step="0.5" min="0" inputmode="decimal" class="num-input">
+          <span class="unit-label">KG</span>
+        </div>
+        `;
+      }
     } else if (m.type === 'smith-iso') {
       extraFields = `
         <div class="row num-row">
@@ -1003,6 +1212,8 @@ const state = {
   machines: loadMachines(),
   activeId: loadActive(),
   target: loadTarget(),
+  unit: loadUnit(),
+  has25kg: loadHas25kg(),
 };
 
 // ensure active is valid
@@ -1038,8 +1249,25 @@ function renderDeltaButtons() {
 function init() {
   renderMachineSelect();
   renderDeltaButtons();
+  renderUnitToggle();
   document.getElementById('target').value = state.target;
   render();
+
+  document.querySelectorAll('.unit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.unit = btn.dataset.unit;
+      saveUnit(state.unit);
+      renderUnitToggle();
+      render();
+    });
+  });
+
+  document.getElementById('has25kgBtn').addEventListener('click', () => {
+    state.has25kg = !state.has25kg;
+    saveHas25kg(state.has25kg);
+    renderUnitToggle();
+    render();
+  });
 
   document.getElementById('machineSelect').addEventListener('change', e => {
     state.activeId = e.target.value;
@@ -1106,7 +1334,7 @@ function attachMachineListeners() {
         const m = state.machines.find(x => x.id === id);
         if (!m) return;
         let value = input.value;
-        if (['barWeight', 'leftHandle', 'rightHandle'].includes(field)) {
+        if (['barWeight', 'barWeightKg', 'leftHandle', 'rightHandle'].includes(field)) {
           value = parseFloat(value);
           if (!Number.isFinite(value) || value < 0) value = 0;
         }
@@ -1114,6 +1342,7 @@ function attachMachineListeners() {
         // Seed sensible defaults when switching into a type that needs them
         if (field === 'type') {
           if ((value === 'smith' || value === 'barbell') && m.barWeight == null) m.barWeight = 45;
+          if (value === 'barbell' && m.barWeightKg == null) m.barWeightKg = 20;
           if (value === 'smith-iso') {
             if (m.leftHandle == null) m.leftHandle = 45;
             if (m.rightHandle == null) m.rightHandle = 45;
